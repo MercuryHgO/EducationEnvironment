@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String @unique
+  password String
+}
+
+model Student {
+  id         String     @id @default(uuid())
+  name       String
+  surname    String
+  patronymic String?
+  group      Group      @relation(fields: [groupCode], references: [code])
+  groupCode  String
+  GradeLog   GradeLog[]
+}
+
+model Group {
+  code            String            @id
+  specialization  String
+  curator         Teacher           @relation(fields: [teacherId], references: [id])
+  Student         Student[]
+  GradeLog        GradeLog[]
+  Schedule        Schedule[]
+  ScheduleChanges ScheduleChanges[]
+  teacherId       String
+}
+
+model GradeLog {
+  id        String   @id @default(uuid())
+  date      DateTime
+  Student   Student  @relation(fields: [studentId], references: [id])
+  studentId String
+  Subject   Subject  @relation(fields: [subjectId], references: [id])
+  subjectId String
+  Group     Group    @relation(fields: [groupCode], references: [code])
+  groupCode String
+  grade     Int
+}
+
+model Teacher {
+  id              String            @id @default(uuid())
+  name            String
+  surname         String
+  patronymic      String?
+  category        String
+  education       String
+  Schedule        Schedule[]
+  ScheduleChanges ScheduleChanges[]
+  Group           Group[]
+}
+
+model Subject {
+  id              String            @id @default(uuid())
+  name            String
+  GradeLog        GradeLog[]
+  Schedule        Schedule[]
+  ScheduleChanges ScheduleChanges[]
+}
+
+model Schedule {
+  id              String            @id @default(uuid())
+  date            DateTime
+  Subject         Subject           @relation(fields: [subjectId], references: [id])
+  subjectId       String
+  cabinet         Int
+  Teacher         Teacher           @relation(fields: [teacherId], references: [id])
+  teacherId       String
+  Group           Group             @relation(fields: [groupCode], references: [code])
+  groupCode       String
+  ScheduleChanges ScheduleChanges[]
+}
+
+model ScheduleChanges {
+  id         String   @id @default(uuid())
+  Schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId String
+  Subject    Subject  @relation(fields: [subjectId], references: [id])
+  subjectId  String
+  cabinet    Int
+  Teacher    Teacher  @relation(fields: [teacherId], references: [id])
+  teacherId  String
+  Group      Group    @relation(fields: [groupCode], references: [code])
+  groupCode  String
+}
+
+model DestroyedTokens {
+  Token   String   @unique
+  ClearAt DateTime
+}
