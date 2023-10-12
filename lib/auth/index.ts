@@ -1,12 +1,7 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import {sha256} from "js-sha256";
 import {verify, sign, JwtPayload} from "jsonwebtoken";
-import {bailOnNotFound} from "next/dist/client/components/dev-root-not-found-boundary";
 import {prisma} from "@/lib/prisma"
-
-// Загрузка значений .env
-// TODO: Сделать проверку на отсутствие ключей
-require('dotenv').config()
+import keys from "@/lib/dotenv"
 
 async function deleteExpiredDestroyedTokens() {
 	const now = new Date()
@@ -55,7 +50,7 @@ export async function generateTokens(name: string, password: string) {
 			{
 				id: id
 			},
-			process.env.JWT_ACCESS_KEY!,
+			keys.JWT_ACCESS_KEY,
 			{
 				expiresIn: '15m',
 			}
@@ -66,7 +61,7 @@ export async function generateTokens(name: string, password: string) {
 				id: id,
 				accessToken: accessToken
 			},
-			process.env.JWT_REFRESH_KEY!,
+			keys.JWT_REFRESH_KEY!,
 			{
 				expiresIn: '1d',
 			}
@@ -87,7 +82,7 @@ export async function generateTokens(name: string, password: string) {
 export async function signIn(accessToken: string){
 	let decodedInfo: string | JwtPayload | undefined
 	
-	verify(accessToken,process.env.JWT_ACCESS_KEY!,(error, decoded) => {
+	verify(accessToken,keys.JWT_ACCESS_KEY!,(error, decoded) => {
 		if (error) {
 			console.log(error)
 			return null;
@@ -113,7 +108,7 @@ export async function updateTokens(refreshToken: string){
 	let access: string | undefined
 	let refresh: string | undefined
 	
-	verify(refreshToken,process.env.JWT_REFRESH_KEY!,async (error, decoded) => {
+	verify(refreshToken,keys.JWT_REFRESH_KEY!,async (error, decoded) => {
 		if (error) return;
 		
 		const {id, accessToken} = decoded as { id: string, accessToken: string };
@@ -139,7 +134,7 @@ export async function updateTokens(refreshToken: string){
 			{
 				id: id
 			},
-			process.env.JWT_ACCESS_KEY!,
+			keys.JWT_ACCESS_KEY!,
 			{
 				expiresIn: '15m'
 			}
@@ -150,7 +145,7 @@ export async function updateTokens(refreshToken: string){
 				id: id,
 				accessToken: newAccessToken
 			},
-			process.env.JWT_REFRESH_KEY!,
+			keys.JWT_REFRESH_KEY!,
 			{
 				expiresIn: '1h'
 			}

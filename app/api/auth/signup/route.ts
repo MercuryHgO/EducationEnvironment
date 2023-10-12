@@ -1,8 +1,6 @@
-import {sha256} from "js-sha256";
 import {NextResponse} from "next/server";
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library";
-import {prisma} from "@/lib/prisma"
-import {signUp} from "@/lib/auth/auth";
+import {signUp} from "@/lib/auth";
 
 // TODO: Обработка ошибок
 export async function POST(req: Request) {

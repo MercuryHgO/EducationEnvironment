@@ -4,7 +4,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import {Prisma} from ".prisma/client";
 import StudentCreateManyInput = Prisma.StudentCreateManyInput;
 import StudentScalarWhereInput = Prisma.StudentScalarWhereInput;
-import {signIn} from "@/lib/auth/auth";
+import {signIn} from "@/lib/auth";
 
 // TODO: написать документацию
 // TODO: написать общую функцию для авторизации

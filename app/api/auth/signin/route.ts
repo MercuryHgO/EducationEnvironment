@@ -1,4 +1,4 @@
-import {generateTokens, signIn, updateTokens} from "@/lib/auth/auth";
+import {generateTokens, updateTokens} from "@/lib/auth";
 import {NextResponse} from "next/server";
 
 export async function GET(req: Request) {
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 		)
 	)
 	
-	const {name, password, access, refresh} = query
+	const {name, password, refresh} = query
 	
 	if(refresh){
 		const updatedTokens = await updateTokens(refresh)
