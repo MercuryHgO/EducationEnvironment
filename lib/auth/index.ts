@@ -1,7 +1,8 @@
 import {sha256} from "js-sha256";
-import {verify, sign, JwtPayload} from "jsonwebtoken";
+import {verify, sign, JwtPayload, VerifyErrors } from "jsonwebtoken";
 import {prisma} from "@/lib/prisma"
 import keys from "@/lib/dotenv"
+import {NextResponse} from "next/server";
 
 async function deleteExpiredDestroyedTokens() {
 	const now = new Date()
@@ -28,7 +29,7 @@ export async function signUp(name: string,password: string) {
 		}
 	})
 	
-	return 'created new user: ' + name
+	return 'created new user: ' + query.name
 }
 
 /**
@@ -82,7 +83,7 @@ export async function generateTokens(name: string, password: string) {
 export async function signIn(accessToken: string){
 	let decodedInfo: string | JwtPayload | undefined
 	
-	verify(accessToken,keys.JWT_ACCESS_KEY!,(error, decoded) => {
+	verify(accessToken,keys.JWT_ACCESS_KEY!,(error: VerifyErrors | null, decoded: any) => {
 		if (error) {
 			console.log(error)
 			return null;
@@ -108,7 +109,7 @@ export async function updateTokens(refreshToken: string){
 	let access: string | undefined
 	let refresh: string | undefined
 	
-	verify(refreshToken,keys.JWT_REFRESH_KEY!,async (error, decoded) => {
+	verify(refreshToken,keys.JWT_REFRESH_KEY!,async (error: VerifyErrors | null, decoded: any) => {
 		if (error) return;
 		
 		const {id, accessToken} = decoded as { id: string, accessToken: string };
@@ -116,7 +117,7 @@ export async function updateTokens(refreshToken: string){
 		await deleteExpiredDestroyedTokens()
 		
 		const now = new Date()
-		const query = await prisma.destroyedTokens.createMany({
+		await prisma.destroyedTokens.createMany({
 			data: [
 				{
 					Token: accessToken,
@@ -165,3 +166,20 @@ export async function updateTokens(refreshToken: string){
 	return null
 }
 
+// TODO: Переместить в подходящее место
+/**
+ * Authorizes user with Access token using request object - it finds Access header in the request and returns NextResponse.json object if something goes wrong
+ *
+ * Авторизирует пользователя с помощью Access токена используя объект Request - ищет заголовок Access в предоставленом запросе и возвращает NextResponse.json если что-то идет не так
+ */
+export async function authorizeAccess(req: Request) {
+	const access = req.headers.get('Access')
+	if(!access) return NextResponse.json('No access token provided',{status: 403})
+	// console.log(access)
+	
+	const data = await signIn(access)
+	// console.log(data)
+	if(!data) return NextResponse.json('Invalid token', {status: 401})
+	
+	return data
+}

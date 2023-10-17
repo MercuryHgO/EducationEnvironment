@@ -1,10 +1,29 @@
-
+const sha256 = require('js-sha256')
 const PrismaClient = require('.prisma/client')
 
 const prisma = new PrismaClient.PrismaClient();
 
 
+console.log('start seeding')
+
 async function main() {
+	// users
+	const dummyUser = await prisma.user.upsert(
+		{
+			where: {
+				name: 'boba'
+			},
+			create: {
+				name: 'boba',
+				password: sha256('aboba')
+			},
+			update: {}
+		}
+	)
+	
+	console.log(dummyUser)
+	
+	// students
 	const misha = await prisma.student.upsert({
 		where: {
 			id: 'cuid1',

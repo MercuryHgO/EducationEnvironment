@@ -4,19 +4,14 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import {Prisma} from ".prisma/client";
 import StudentCreateManyInput = Prisma.StudentCreateManyInput;
 import StudentScalarWhereInput = Prisma.StudentScalarWhereInput;
-import {signIn} from "@/lib/auth";
+import {authorizeAccess} from "@/lib/auth";
 
 // TODO: написать документацию
-// TODO: написать общую функцию для авторизации
+
 export async function GET(req: Request) {
 	
-	const access = req.headers.get('Access')
-	if(!access) return NextResponse.json('No access token provided',{status: 403})
-	console.log(access)
-	
-	const data = await signIn(access)
-	console.log(data)
-	if(!data) return NextResponse.json('Invalid token', {status: 401})
+	const authorizationData = await authorizeAccess(req)
+	if(typeof authorizationData == typeof NextResponse<any>) return authorizationData
 	
 	
 	const url = (req.url).split('?');
@@ -77,13 +72,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
 	
-	const access = req.headers.get('Access')
-	if(!access) return NextResponse.json('No access token provided',{status: 403})
-	console.log(access)
-	
-	const data = await signIn(access)
-	console.log(data)
-	if(!data) return NextResponse.json('Invalid token', {status: 401})
+	const authorizationData = await authorizeAccess(req)
+	if(typeof authorizationData == typeof NextResponse<any>) return authorizationData
 	
 	try {
 		const data: StudentCreateManyInput[] = await req.json()
@@ -114,13 +104,9 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request){
-	const access = req.headers.get('Access')
-	if(!access) return NextResponse.json('No access token provided',{status: 403})
-	console.log(access)
 	
-	const data = await signIn(access)
-	console.log(data)
-	if(!data) return NextResponse.json('Invalid token', {status: 401})
+	const authorizationData = await authorizeAccess(req)
+	if(typeof authorizationData == typeof NextResponse<any>) return authorizationData
 	
 	try {
 		// Костыль: тип для update возвращает какую-то херню, но если использовать ManyInput то резльтат тот же.
@@ -164,13 +150,9 @@ export async function PATCH(req: Request){
 }
 
 export async function DELETE(req: Request) {
-	const access = req.headers.get('Access')
-	if(!access) return NextResponse.json('No access token provided',{status: 403})
-	console.log(access)
 	
-	const data = await signIn(access)
-	console.log(data)
-	if(!data) return NextResponse.json('Invalid token', {status: 401})
+	const authorizationData = await authorizeAccess(req)
+	if(typeof authorizationData == typeof NextResponse<any>) return authorizationData
 	
 	try {
 		const data: StudentScalarWhereInput[] = await req.json()
