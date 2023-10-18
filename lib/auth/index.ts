@@ -2,7 +2,6 @@ import {sha256} from "js-sha256";
 import {verify, sign, JwtPayload, VerifyErrors } from "jsonwebtoken";
 import {prisma} from "@/lib/prisma"
 import keys from "@/lib/dotenv"
-import {NextResponse} from "next/server";
 
 async function deleteExpiredDestroyedTokens() {
 	const now = new Date()
@@ -164,22 +163,4 @@ export async function updateTokens(refreshToken: string){
 	}
 	
 	return null
-}
-
-// TODO: Переместить в подходящее место
-/**
- * Authorizes user with Access token using request object - it finds Access header in the request and returns NextResponse.json object if something goes wrong
- *
- * Авторизирует пользователя с помощью Access токена используя объект Request - ищет заголовок Access в предоставленом запросе и возвращает NextResponse.json если что-то идет не так
- */
-export async function authorizeAccess(req: Request) {
-	const access = req.headers.get('Access')
-	if(!access) return NextResponse.json('No access token provided',{status: 403})
-	// console.log(access)
-	
-	const data = await signIn(access)
-	// console.log(data)
-	if(!data) return NextResponse.json('Invalid token', {status: 401})
-	
-	return data
 }
