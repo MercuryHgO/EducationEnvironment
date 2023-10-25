@@ -13,8 +13,12 @@ keysArray.forEach((obj) => {
 	if(obj[1] === undefined)  throw new Error(obj[0]+' is not defined in .env')
 })
 
-const keys = Object.fromEntries(keysArray)
+const keys: {
+	DATABASE_URL: string,
+	JWT_ACCESS_KEY: string,
+	JWT_REFRESH_KEY: string,
+} = Object.fromEntries(keysArray)
 
-console.log(keys)
+// console.log(keys)
 
 export default keys

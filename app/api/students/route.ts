@@ -88,75 +88,81 @@ import {Prisma} from ".prisma/client";
 import StudentCreateManyInput = Prisma.StudentCreateManyInput;
 import StudentScalarWhereInput = Prisma.StudentScalarWhereInput;
 import {authorizeAccess} from "@/lib/auth/requestAuthorization";
+import {Student} from "@prisma/client";
 
-export async function GET(req: Request) {
-	
-	const authorizationData = await authorizeAccess(req)
-	if(typeof authorizationData == typeof NextResponse<any>) return authorizationData
-	
-	
-	const url = (req.url).split('?');
-	
-	const query = Object.fromEntries(
-		url[1].split('&').map(
-			(val) => val.split('=')
+export async function GET(req: Request): Promise<NextResponse<Student | Student[] | string> | undefined> {
+	try {
+		const authorizationData = await authorizeAccess(req)
+		
+		const url = (req.url).split('?');
+		
+		const query = Object.fromEntries(
+			url[1].split('&').map(
+				(val) => val.split('=')
+			)
 		)
-	)
-	
-	const {
-		id,
-		name,
-		surname,
-		patronymic,
-		groupCode
-	} = query;
-	
-	console.log(decodeURIComponent(groupCode))
-	
-	if(id){
-		const student = await prisma.student.findFirst({
-			where: {
-				id: id
-			}
-		})
 		
-		if(!student){
-			return NextResponse.json('No student found',{
-				status: 404
+		const {
+			id,
+			name,
+			surname,
+			patronymic,
+			groupCode
+		} = query;
+		
+		// console.log(decodeURIComponent(groupCode))
+		
+		if (id) {
+			const student = await prisma.student.findFirst({
+				where: {
+					id: id
+				}
 			})
+			
+			if (!student) {
+				return NextResponse.json('No student found', {
+					status: 404
+				})
+			}
+			
+			return NextResponse.json(student)
 		}
 		
-		return NextResponse.json(student)
-	}
-	
-	if(name || surname || patronymic || groupCode){
-		const student = await prisma.student.findMany({
-			where: {
-				OR: [
-					{name: decodeURIComponent(name)},
-					{surname: decodeURIComponent(surname)},
-					{patronymic: decodeURIComponent(patronymic)},
-					{groupCode: decodeURIComponent(groupCode)}
-				]
-			}
-		})
-		
-		if(!(student[0])){
-			return NextResponse.json('No student found',{
-				status: 404
+		if (name || surname || patronymic || groupCode) {
+			const student = await prisma.student.findMany({
+				where: {
+					OR: [
+						{name: decodeURIComponent(name)},
+						{surname: decodeURIComponent(surname)},
+						{patronymic: decodeURIComponent(patronymic)},
+						{groupCode: decodeURIComponent(groupCode)}
+					]
+				}
 			})
+			
+			if (!(student[0])) {
+				return NextResponse.json('No student found', {
+					status: 404
+				})
+			}
+			
+			return NextResponse.json(student)
 		}
-		
-		return NextResponse.json(student)
+	} catch (e: any) {
+		switch (e.message) {
+			case '403' || '401':
+				return NextResponse.json(e.cause,{status: Number(e.message)})
+			default:
+				return NextResponse.json('Server error', {status: 500})
+		}
 	}
 }
 
 export async function POST(req: Request) {
 	
-	const authorizationData = await authorizeAccess(req)
-	if(typeof authorizationData == typeof NextResponse<any>) return authorizationData
-	
 	try {
+		const authorizationData = await authorizeAccess(req)
+		
 		const data: StudentCreateManyInput[] = await req.json()
 		const query = await prisma.student.createMany({
 			data: data
@@ -179,17 +185,21 @@ export async function POST(req: Request) {
 			case 'PrismaClientValidationError':
 				return NextResponse.json('Your request does not contain required fields', {status: 400})
 			default:
-				return NextResponse.json('Server error',{status:500})
+				switch (e.message) {
+					case '403' || '401':
+						return NextResponse.json(e.cause,{status: Number(e.message)})
+					default:
+						return NextResponse.json('Server error', {status: 500})
+				}
 		}
 	}
 }
 
-export async function PATCH(req: Request){
-	
-	const authorizationData = await authorizeAccess(req)
-	if(typeof authorizationData == typeof NextResponse<any>) return authorizationData
+export async function PATCH(req: Request) {
 	
 	try {
+		const authorizationData = await authorizeAccess(req)
+		
 		// Костыль: тип для update возвращает какую-то херню, но если использовать ManyInput то резльтат тот же.
 		const data: StudentCreateManyInput = await req.json()
 		console.log(data)
@@ -204,10 +214,10 @@ export async function PATCH(req: Request){
 				groupCode: data.groupCode
 			}
 		})
-
+		
 		return NextResponse.json(query)
 	} catch (e: any) {
-		if(e instanceof PrismaClientKnownRequestError) {
+		if (e instanceof PrismaClientKnownRequestError) {
 			console.log(e)
 			console.log(e.code)
 			switch (e.code) {
@@ -215,7 +225,7 @@ export async function PATCH(req: Request){
 					const {field_name} = e.meta!
 					return NextResponse.json(`Wrong request body: ${field_name}`, {status: 400})
 				case 'P2025':
-					return NextResponse.json('Record not found',{status:404})
+					return NextResponse.json('Record not found', {status: 404})
 				default:
 					return NextResponse.json('Server error', {status: 500})
 			}
@@ -225,17 +235,21 @@ export async function PATCH(req: Request){
 			case 'PrismaClientValidationError':
 				return NextResponse.json('Your request does not contain required fields', {status: 400})
 			default:
-				return NextResponse.json('Server error',{status:500})
+				switch (e.message) {
+					case '403' || '401':
+						return NextResponse.json(e.cause, {status: Number(e.message)})
+					default:
+						return NextResponse.json('Server error', {status: 500})
+				}
 		}
 	}
 }
 
 export async function DELETE(req: Request) {
 	
-	const authorizationData = await authorizeAccess(req)
-	if(typeof authorizationData == typeof NextResponse<any>) return authorizationData
-	
 	try {
+		const authorizationData = await authorizeAccess(req)
+		
 		const data: StudentScalarWhereInput[] = await req.json()
 		
 		const query = await prisma.student.deleteMany({
@@ -246,7 +260,7 @@ export async function DELETE(req: Request) {
 		
 		return NextResponse.json(query)
 	} catch (e: any) {
-		if(e instanceof PrismaClientKnownRequestError) {
+		if (e instanceof PrismaClientKnownRequestError) {
 			console.log(e)
 			console.log(e.code)
 			switch (e.code) {
@@ -254,7 +268,7 @@ export async function DELETE(req: Request) {
 					const {field_name} = e.meta!
 					return NextResponse.json(`Wrong request body: ${field_name}`, {status: 400})
 				case 'P2025':
-					return NextResponse.json('Record not found',{status:404})
+					return NextResponse.json('Record not found', {status: 404})
 				default:
 					return NextResponse.json('Server error', {status: 500})
 			}
@@ -264,7 +278,12 @@ export async function DELETE(req: Request) {
 			case 'PrismaClientValidationError':
 				return NextResponse.json('Your request does not contain required fields', {status: 400})
 			default:
-				return NextResponse.json('Server error',{status:500})
+				switch (e.message) {
+					case '403' || '401':
+						return NextResponse.json(e.cause, {status: Number(e.message)})
+					default:
+						return NextResponse.json('Server error', {status: 500})
+				}
 		}
 	}
 }
