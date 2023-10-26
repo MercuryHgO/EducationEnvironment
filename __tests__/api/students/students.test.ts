@@ -5,10 +5,19 @@ import {sign} from "jsonwebtoken";
 import * as studentEndpoints from '../../../app/api/students/route'
 import keys from "../../../lib/dotenv";
 import {createRequest} from 'node-mocks-http'
+import {prisma} from "../../../lib/prisma"
 
-// TODO: Создавать тестового пользователя
-const testAccessKey = sign({ id: '23f9e63a-1ef5-4906-8096-0ef25a782591'},keys.JWT_ACCESS_KEY)
+const getAccessKey = async ()=> {
+	const User= await prisma.user.findUnique({
+		where: {
+			name: "boba"
+		}
+	})
+	const {id}= User
 
+	return sign({id: id}, keys.JWT_ACCESS_KEY)
+
+}
 describe('Api endpoint /api/students', () => {
 	describe('GET', () => {
 		
@@ -18,7 +27,7 @@ describe('Api endpoint /api/students', () => {
 				url: '?id=cuid1',
 				method: 'GET',
 				headers: {
-					Access: testAccessKey
+					Access: await getAccessKey()
 				}
 			})
 			
@@ -36,7 +45,7 @@ describe('Api endpoint /api/students', () => {
 				url: '?name=Михаил',
 				method: 'GET',
 				headers: {
-					Access: testAccessKey
+					Access: await getAccessKey()
 				}
 			})
 			
