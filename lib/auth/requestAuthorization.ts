@@ -1,7 +1,4 @@
-// import {NextResponse} from "next/server";
 import {signIn} from "@/lib/auth/index";
-import {NextRequest, NextResponse} from "next/server";
-
 /**
  * Authorizes user with Access token using request object - it finds Access header in the request and returns NextResponse.json object if something goes wrong
  *
@@ -10,11 +7,11 @@ import {NextRequest, NextResponse} from "next/server";
 export async function authorizeAccess(req: Request) {
 	// @ts-ignore
 	const access = req.headers['access']
-	if(!access) throw new Error('403',{cause: 'No access token provided'})
+	if(!access) throw new Error('NO_TOKEN',{cause: 'No access token provided'})
 	// console.log(access)
 	
 	const data = await signIn(access)
-	if(!data) throw new Error('401', {cause: 'Invalid token'})
+	if(!data) throw new Error('WRONG_TOKEN', {cause: 'Invalid token'})
 	// console.log(data)
 	
 	return data!

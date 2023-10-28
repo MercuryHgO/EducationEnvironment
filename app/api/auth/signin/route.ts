@@ -29,23 +29,4 @@ export async function GET(req: Request) {
 	}
 	
 	return NextResponse.json('Not valid data',{status: 400})
-	// if(access){
-	// 	const data = await signIn(access)
-	//
-	// 	if(!data) return NextResponse.json('Authorization error',{status: 401})
-	//
-	// 	return NextResponse.json(data).headers.set('Access',access)
-	// }
-	//
-	// if(refresh){
-	// 	const newTokens = await updateTokens(refresh)
-	//
-	// 	if (!newTokens) return NextResponse.json('Authorization error',{status: 401})
-	//
-	// 	const responce = NextResponse.json(newTokens)
-	// 	responce.headers.set('Refresh',newTokens.refresh)
-	// 	responce.headers.set('Access',newTokens.access)
-	//
-	// 	return responce
-	// }
 }
