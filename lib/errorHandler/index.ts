@@ -8,15 +8,13 @@ import {NextResponse} from "next/server";
  * #
  * ### Error list / Список ошибок:
  *
- * P2003 - 400
+ * P2003, PrismaClientValidationError  - 400
+ *
+ * NO_TOKEN - 401
  *
  * P2025 - 404
  *
- * PrismaClientValidationError - 400
- *
- * WRONG_TOKEN - 403
- *
- * NO_TOKEN - 401
+ * WRONG_TOKEN, NO_REQUIRED_TOKEN - 403
  */
 const handleErrorToHTTP = (e: any) => {
 	if (e instanceof PrismaClientKnownRequestError) {
@@ -40,7 +38,7 @@ const handleErrorToHTTP = (e: any) => {
 			switch (e.message) {
 				case 'NO_TOKEN':
 					return NextResponse.json(e.cause, {status: 401})
-				case 'WRONG_TOKEN':
+				case 'WRONG_TOKEN' || 'NO_REQUIRED_ROLE':
 					return NextResponse.json(e.cause, {status: 403})
 				default:
 					return NextResponse.json('Server error', {status: 500})

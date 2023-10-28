@@ -7,6 +7,30 @@ const prisma = new PrismaClient.PrismaClient();
 console.log('start seeding')
 
 async function main() {
+	// roles
+	
+	const userRole = await prisma.role.upsert({
+		where: {
+			name: 'user'
+		},
+		update: {},
+		create: {
+			name: 'user'
+		}
+	})
+	
+	const adminRole = await prisma.role.upsert({
+		where: {
+			name: 'admin'
+		},
+		update: {},
+		create: {
+			name: 'admin'
+		}
+	})
+	
+	console.log(userRole,adminRole)
+	
 	// users
 	const dummyUser = await prisma.user.upsert(
 		{
@@ -15,13 +39,19 @@ async function main() {
 			},
 			create: {
 				name: 'boba',
-				password: sha256('aboba')
+				password: sha256('aboba'),
+				role: {
+					connect: {
+						name: 'admin'
+					}
+				}
 			},
 			update: {}
 		}
 	)
 	
 	console.log(dummyUser)
+	
 	
 	// students
 	const misha = await prisma.student.upsert({

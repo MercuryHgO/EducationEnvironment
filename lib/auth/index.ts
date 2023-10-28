@@ -19,12 +19,17 @@ async function deleteExpiredDestroyedTokens() {
  *
  * Создает нового пользователя в базе данных
 */
-export async function signUp(name: string,password: string) {
+export async function signUp(name: string,password: string, role?: string) {
 	
 	const query = await prisma.user.create({
 		data: {
 			name: name,
-			password: sha256(password)
+			password: sha256(password),
+			role: {
+				connect: {
+					name: role ?? 'user'
+				}
+			}
 		}
 	})
 	
@@ -41,14 +46,17 @@ export async function generateTokens(name: string, password: string) {
 		where: {
 			name: name,
 			password: sha256(password)
-		}
+		},
+		// include: {
+		// 	role: true
+		// }
 	})
 	
 	if(query) {
 		const { id } = query;
 		const accessToken = sign(
 			{
-				id: id
+				id: id,
 			},
 			keys.JWT_ACCESS_KEY,
 			{
@@ -91,9 +99,8 @@ export async function signIn(accessToken: string){
 	})
 	
 	if(!!decodedInfo){
-		const { id } = decodedInfo as {id: string}
-		return {
-			id
+		return decodedInfo as {
+			id: string
 		}
 	}
 }

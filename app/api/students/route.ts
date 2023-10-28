@@ -156,7 +156,7 @@ export async function GET(req: Request): Promise<NextResponse<Student | Student[
 export async function POST(req: Request) {
 	
 	try {
-		const authorizationData = await authorizeAccess(req)
+		const authorizationData = await authorizeAccess(req,['admin'])
 		
 		const data: StudentCreateManyInput[] = await req.json()
 		const query = await prisma.student.createMany({
@@ -172,7 +172,7 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
 	
 	try {
-		const authorizationData = await authorizeAccess(req)
+		const authorizationData = await authorizeAccess(req,['admin'])
 		
 		// Костыль: тип для update возвращает какую-то херню, но если использовать ManyInput то результат тот же.
 		const data: StudentCreateManyInput = await req.json()
@@ -198,7 +198,7 @@ export async function PATCH(req: Request) {
 export async function DELETE(req: Request) {
 	
 	try {
-		const authorizationData = await authorizeAccess(req)
+		const authorizationData = await authorizeAccess(req,['admin'])
 		
 		const data: StudentScalarWhereInput[] = await req.json()
 		
