@@ -1,0 +1,26 @@
+{
+  "roles": {
+    "students": {
+      "POST": [
+        "admin"
+      ],
+      "PATCH": [
+        "admin"
+      ],
+      "DELETE": [
+        "admin"
+      ]
+    },
+    "teachers": {
+      "POST": [
+        "admin"
+      ],
+      "PATCH": [
+        "admin"
+      ],
+      "DELETE": [
+        "admin"
+      ]
+    }
+  }
+}

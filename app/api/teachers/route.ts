@@ -1,3 +1,4 @@
+// TODO: Документация
 /** @file
  * # API endpoint /api/students
  * Provides access to the students data from database.
@@ -80,21 +81,19 @@
  *
  * **{ id?, name?, surname?, patronymic?, groupCode? }**
  */
-
-import {NextResponse} from "next/server";
-import {prisma} from "@/lib/prisma";
-import {Prisma} from ".prisma/client";
-import StudentCreateManyInput = Prisma.StudentCreateManyInput;
-import StudentScalarWhereInput = Prisma.StudentScalarWhereInput;
-import {authorizeAccess} from "@/lib/auth/requestAuthorization";
-import {Student} from "@prisma/client";
 import handleErrorToHTTP from "@/lib/errorHandler";
+import {authorizeAccess} from "@/lib/auth/requestAuthorization";
 import {roles} from "@/lib/config";
-import StudentUpdateArgs = Prisma.StudentUpdateArgs;
+import {prisma} from "@/lib/prisma";
+import {NextResponse} from "next/server";
+import {Prisma} from ".prisma/client";
+import TeacherCreateManyInput = Prisma.TeacherCreateManyInput;
+import TeacherUpdateArgs = Prisma.TeacherUpdateArgs;
+import TeacherScalarWhereWithAggregatesInput = Prisma.TeacherScalarWhereWithAggregatesInput;
 
-export async function GET(req: Request): Promise<NextResponse<Student | Student[] | string> | undefined> {
+export async function GET(req: Request) {
 	try {
-		await authorizeAccess(req,roles?.students?.GET)
+		await authorizeAccess(req,roles?.teachers?.GET)
 		
 		const url = (req.url).split('?');
 		
@@ -104,101 +103,85 @@ export async function GET(req: Request): Promise<NextResponse<Student | Student[
 			)
 		)
 		
-		const {
-			id,
-			name,
-			surname,
-			patronymic,
-			groupCode
-		} = query;
+		const {id, name, surname, patronymic, education} = query
 		
-		// console.log(decodeURIComponent(groupCode))
-		
-		if (id) {
-			const student = await prisma.student.findFirst({
+		if(id) {
+			const teacher = await prisma.teacher.findUnique({
 				where: {
 					id: id
 				}
 			})
 			
-			if (!student) {
-				return NextResponse.json('No student found', {
-					status: 404
-				})
+			if(!teacher) {
+				return NextResponse.json('No teacher found',{status: 404})
 			}
 			
-			return NextResponse.json(student)
+			return NextResponse.json(teacher)
 		}
 		
-		const student = await prisma.student.findMany({
+		const teachers = await prisma.teacher.findMany({
 			where: {
 				OR: [
 					{name: decodeURIComponent(name)},
 					{surname: decodeURIComponent(surname)},
 					{patronymic: decodeURIComponent(patronymic)},
-					{groupCode: decodeURIComponent(groupCode)}
+					{education: decodeURIComponent(education)}
 				]
 			}
 		})
 		
-		if (!(student[0])) {
-			return NextResponse.json('No student found', {
-				status: 404
-			})
+		if(!teachers[0]) {
+			return NextResponse.json('No teachers found',{status: 404})
 		}
 		
-		return NextResponse.json(student)
-	} catch (e: any) {
+		return NextResponse.json(teachers)
+	} catch (e) {
 		return handleErrorToHTTP(e)
 	}
 }
 
 export async function POST(req: Request) {
-	
 	try {
-		await authorizeAccess(req,roles?.students?.POST)
+		await authorizeAccess(req,roles?.teachers?.POST)
 		
-		const data: StudentCreateManyInput[] = await req.json()
-		const query = await prisma.student.createMany({
+		const data: TeacherCreateManyInput[] = await req.json()
+		
+		const query = await prisma.teacher.createMany({
 			data: data
 		})
-
+		
 		return NextResponse.json(query)
-	} catch (e: any) {
+	} catch (e) {
 		return handleErrorToHTTP(e)
 	}
 }
-
 export async function PATCH(req: Request) {
-	
 	try {
-		await authorizeAccess(req,roles?.students?.PATCH)
+		await authorizeAccess(req,roles?.teachers?.PATCH)
 		
-		const data: StudentUpdateArgs = await req.json()
+		const data: TeacherUpdateArgs = await req.json()
 		
-		const query = await prisma.student.update(data)
+		const query = await prisma.teacher.update(data)
 		
 		return NextResponse.json(query)
-	} catch (e: any) {
+	} catch (e) {
 		return handleErrorToHTTP(e)
 	}
 }
-
 export async function DELETE(req: Request) {
-	
 	try {
-		await authorizeAccess(req,roles?.students?.DELETE)
+		await authorizeAccess(req,roles?.teachers?.DELETE)
 		
-		const data: StudentScalarWhereInput[] = await req.json()
+		const data: TeacherScalarWhereWithAggregatesInput[] = await req.json()
 		
-		const query = await prisma.student.deleteMany({
-			where: {
+		const query = await prisma.teacher.deleteMany({
+			where:{
 				OR: data
 			}
 		})
 		
 		return NextResponse.json(query)
-	} catch (e: any) {
+	} catch (e) {
 		return handleErrorToHTTP(e)
 	}
 }
