@@ -39,7 +39,6 @@ model Group {
   specialization  String
   curator         Teacher           @relation(fields: [teacherId], references: [id])
   Student         Student[]
-  GradeLog        GradeLog[]
   Schedule        Schedule[]
   ScheduleChanges ScheduleChanges[]
   teacherId       String
@@ -52,8 +51,6 @@ model GradeLog {
   studentId String
   Subject   Subject  @relation(fields: [subjectId], references: [id])
   subjectId String
-  Group     Group    @relation(fields: [groupCode], references: [code])
-  groupCode String
   grade     Int
 }
 
@@ -71,7 +68,7 @@ model Teacher {
 
 model Subject {
   id              String            @id @default(uuid())
-  name            String
+  name            String            @unique
   GradeLog        GradeLog[]
   Schedule        Schedule[]
   ScheduleChanges ScheduleChanges[]

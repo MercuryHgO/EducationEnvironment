@@ -168,6 +168,101 @@ async function main() {
 		}
 	})
 	console.log(misha,svyat,nemisha)
+	
+	// gradeLog
+	
+	const createGradeLogRow = (subjectName: string, studentId: string, date: Date, grade: number) => {
+		return {
+			date: date,
+			Subject: {
+				connectOrCreate: {
+					where: {
+						name: subjectName
+					},
+					create: {
+						name: subjectName
+					}
+				}
+			},
+			Student: {
+				connect: {
+					id: studentId
+				}
+			},
+			grade: grade
+		}
+	}
+	
+	const grade1 = await prisma.gradeLog.upsert({
+		where: {id: '1'},
+		create: createGradeLogRow('math','cuid1',new Date('11.11.2023'),5),
+		update: {}
+	})
+	
+	const grade2 = await prisma.gradeLog.upsert({
+		where: {id: '2'},
+		create: createGradeLogRow('pe','cuid1',new Date('11.11.2023'),2),
+		update: {}
+	})
+	
+	const grade3 = await prisma.gradeLog.upsert({
+		where: {id: '3'},
+		create: createGradeLogRow('math','cuid2',new Date('11.11.2023'),3),
+		update: {}
+	})
+	
+	const grade4 = await prisma.gradeLog.upsert({
+		where: {id: '4'},
+		create: createGradeLogRow('pe','cuid2',new Date('11.11.2023'),4),
+		update: {}
+	})
+	
+	const grade5 = await prisma.gradeLog.upsert({
+		where: {id: '5'},
+		create: createGradeLogRow('pe','cuid1',new Date('11.12.2023'),-1),
+		update: {}
+	})
+	
+	const grade6 = await prisma.gradeLog.upsert({
+		where: {id: '6'},
+		create: createGradeLogRow('pe','cuid2',new Date('11.12.2023'),-1),
+		update: {}
+	})
+	
+	console.log('grades')
+	console.log(grade1,grade2,grade3,grade4,grade5,grade6)
+	
+	// subjects
+	
+	// const english = prisma.subject.upsert({
+	// 	where: {
+	// 		name: 'english'
+	// 	},
+	// 	create: {
+	// 		name: 'english'
+	// 	},
+	// 	update: {}
+	// })
+	//
+	// const mdk = prisma.subject.upsert({
+	// 	where: {
+	// 		name: 'mdk'
+	// 	},
+	// 	create: {
+	// 		name: 'mdk'
+	// 	},
+	// 	update: {}
+	// })
+	//
+	// const pe = prisma.subject.upsert({
+	// 	where: {
+	// 		name: 'pe'
+	// 	},
+	// 	create: {
+	// 		name: 'pe'
+	// 	},
+	// 	update: {}
+	// })
 }
 
 main()
