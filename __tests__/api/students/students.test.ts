@@ -23,7 +23,7 @@ describe('Api endpoint /api/students', () => {
 		
 		
 		test('Must return single JSON of {id,name,surname,groupCode}', async () => {
-			const req1 = createRequest({
+			const req1: Request = createRequest({
 				url: '?id=cuid1',
 				method: 'GET',
 				headers: {
@@ -42,7 +42,7 @@ describe('Api endpoint /api/students', () => {
 		})
 		
 		test('Must return an array of {id,name,surname,groupCode}[]', async () => {
-			const req2 = createRequest({
+			const req2: Request = createRequest({
 				url: '?name=Михаил',
 				method: 'GET',
 				headers: {
@@ -54,14 +54,14 @@ describe('Api endpoint /api/students', () => {
 			const data = await res?.json()
 			
 			expect(Array.isArray(data)).toBe(true)
-			expect(data[0]).toHaveProperty(['id'])
-			expect(data[0]).toHaveProperty(['name'])
-			expect(data[0]).toHaveProperty(['surname'])
-			expect(data[0]).toHaveProperty(['groupCode'])
+			expect(data![0]).toHaveProperty(['id'])
+			expect(data![0]).toHaveProperty(['name'])
+			expect(data![0]).toHaveProperty(['surname'])
+			expect(data![0]).toHaveProperty(['groupCode'])
 		})
 		
 		test('Must return error 403 correctly', async () => {
-			const req1 = createRequest({
+			const req1: Request = createRequest({
 				url: '?id=cuid1',
 				method: 'GET',
 				headers: {
