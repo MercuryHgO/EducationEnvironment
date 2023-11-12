@@ -27,6 +27,7 @@ const handleErrorToHTTP = (e: any) => {
 			case 'P2025':
 				return NextResponse.json('Record not found', {status: 404})
 			default:
+				console.log(e);
 				return NextResponse.json('Server error', {status: 500})
 		}
 	}
@@ -41,6 +42,7 @@ const handleErrorToHTTP = (e: any) => {
 				case 'WRONG_TOKEN' || 'NO_REQUIRED_ROLE':
 					return NextResponse.json(e.cause, {status: 403})
 				default:
+					console.log(e);
 					return NextResponse.json('Server error', {status: 500})
 			}
 	}

@@ -5,24 +5,34 @@
  *
  * Предоставляет доступ к информации о студентах из базы данных.
  * Каждая конечная точка требует заголовок 'Access' содержащий токен Access для получения доступа к данным.
- * #
- *
- * ## GET
- * ### Accept:
+ */
+
+import {NextResponse} from "next/server";
+import {prisma} from "@/lib/prisma";
+import {Prisma} from ".prisma/client";
+import StudentCreateManyInput = Prisma.StudentCreateManyInput;
+import StudentScalarWhereInput = Prisma.StudentScalarWhereInput;
+import {authorizeAccess} from "@/lib/auth/requestAuthorization";
+import {Student} from "@prisma/client";
+import handleErrorToHTTP from "@/lib/errorHandler";
+import {roles} from "@/lib/config";
+import StudentUpdateArgs = Prisma.StudentUpdateArgs;
+
+/**
+ * @accept
  * Query string contains **id** or information about student such as **name**, **surname**, **patronymic** or **groupCode**.
  * First it finds **id** in query: if presented, returns a student with this **id**, ignoring other provided information.
  * If **id** not represented, it returns the student for the rest of the provided data, including all provided fields in the search:
  * it can be **?name=[name]**, **?name=[name]&surname=[surname]**, **?patronymic=[patronymic]&groupCode=[group code]** and so on.
- * #
  *
- * ### Принимает:
+ * /
+ *
  * Строку поиска содержащую **id** или информацию о студенте, такую как **name**, **surname**, **patronymic** or **groupCode** (имя, фамилия, отчество, код группы).
  * Первым делом сервер ищет **id** в запросе: если таковой предоставлен, возвращает студента по его **id**, игнорируя другую предоставленную информацию.
  * Если **id** не представлен,  возвращает студента по остальным предоставленным данным, включая в поиск все предоставленные поля:
  * Это может выглядить как **"?name=[имя]"**, **"?name=[имя]&surname=[фамилия]"**, **"?patronymic=[отчество]&groupCode=[код группы]"** и т.п.
- * #
  *
- * ### Returns / Возвращает:
+ * @returns
  * JSON object with student info if found by **id** / JSON объект с данными о студенте, если найден по **id**
  *
  * **{
@@ -44,54 +54,7 @@
  * }[]**
  * #
  *
- * ## POST
- * Creates new student in the database /
- * Создает нового студента в базе данных
- * #
- *
- * ### Accept / Принимает:
- *
- * JSON object array / Массив JSON объектов
- *
- * **{ name, surname, patronymic?, groupCode }[]**
- * #
- *
- * ## PATCH
- * Updates information of student with **id** /
- * Обновляет информацию о студенте с **id**
- * #
- *
- * ### Accept / Принимает
- *
- * JSON object / JSON объект
- *
- * **{ id, name, surname, patronymic?, groupCode }**
- * #
- *
- * ## DELETE
- *
- * Deletes a student /
- * Удаляет студента
- * #
- *
- * ### Accept / Принимает
- *
- * All the given JSON fields: **minimum 1 field necessary** / Все предоставленные поля из JSON объекта: **необходимо хотя бы одно поле**
- *
- * **{ id?, name?, surname?, patronymic?, groupCode? }**
  */
-
-import {NextResponse} from "next/server";
-import {prisma} from "@/lib/prisma";
-import {Prisma} from ".prisma/client";
-import StudentCreateManyInput = Prisma.StudentCreateManyInput;
-import StudentScalarWhereInput = Prisma.StudentScalarWhereInput;
-import {authorizeAccess} from "@/lib/auth/requestAuthorization";
-import {Student} from "@prisma/client";
-import handleErrorToHTTP from "@/lib/errorHandler";
-import {roles} from "@/lib/config";
-import StudentUpdateArgs = Prisma.StudentUpdateArgs;
-
 export async function GET(req: Request): Promise<NextResponse<Student | Student[] | string> | undefined> {
 	try {
 		await authorizeAccess(req,roles?.students?.GET)
@@ -153,6 +116,20 @@ export async function GET(req: Request): Promise<NextResponse<Student | Student[
 	}
 }
 
+/**
+ * Creates new student in the database /
+ * Создает нового студента в базе данных
+ *
+ * @accept
+ *
+ * JSON object array / Массив JSON объектов
+ *
+ * **{ name, surname, patronymic?, groupCode }[]**
+ *
+ * @returns
+ *
+ * Count of created students / Кол-во созданных студентов
+ */
 export async function POST(req: Request) {
 	
 	try {
@@ -169,6 +146,15 @@ export async function POST(req: Request) {
 	}
 }
 
+/**
+ * Updates information of student with **id** /
+ * Обновляет информацию о студенте с **id**
+ *
+ * @accept
+ * JSON object / JSON объект
+ *
+ * **{ id, name, surname, patronymic?, groupCode }**
+ */
 export async function PATCH(req: Request) {
 	
 	try {
@@ -184,6 +170,14 @@ export async function PATCH(req: Request) {
 	}
 }
 
+/**
+ * Deletes a student /
+ * Удаляет студента
+ * @accept
+ * All the given JSON fields: **minimum 1 field necessary** / Все предоставленные поля из JSON объекта: **необходимо хотя бы одно поле**
+ *
+ * **{ id?, name?, surname?, patronymic?, groupCode? }**
+ */
 export async function DELETE(req: Request) {
 	
 	try {

@@ -7,7 +7,7 @@ import {verifyRoles} from "@/lib/auth/verifyRoles";
  */
 export async function authorizeAccess(req: Request, roles?: string[]) {
 	// @ts-ignore
-	const access = req.headers['access']
+	const access = req.headers.get('Access')
 	if(!access) throw new Error('NO_TOKEN',{cause: 'No access token provided'})
 	// console.log(access)
 	
