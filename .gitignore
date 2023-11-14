@@ -39,3 +39,6 @@ next-env.d.ts
 
 # migrations
 /prisma/migrations/
+
+# dbml
+/prisma/dbml

@@ -92,7 +92,7 @@ export async function signIn(accessToken: string){
 	
 	verify(accessToken,keys.JWT_ACCESS_KEY!,(error: VerifyErrors | null, decoded: any) => {
 		if (error) {
-			console.log(error)
+			// console.log(error)
 			return null;
 		}
 		decodedInfo = decoded

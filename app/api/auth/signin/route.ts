@@ -1,32 +1,37 @@
 import {generateTokens, updateTokens} from "@/lib/auth";
 import {NextResponse} from "next/server";
+import handleErrorToHTTP from "@/lib/errorHandler";
 
 export async function GET(req: Request) {
-	const url = (req.url).split('?');
-	
-	const query = Object.fromEntries(
-		url[1].split('&').map(
-			(val) => val.split('=')
+	try {
+		const url = (req.url).split('?');
+		
+		const query = Object.fromEntries(
+			url[1].split('&').map(
+				(val) => val.split('=')
+			)
 		)
-	)
-	
-	const {name, password, refresh} = query
-	
-	if(refresh){
-		const updatedTokens = await updateTokens(refresh)
-		if(!updatedTokens){
-			return NextResponse.json('Invalid refresh token',{status: 401})
+		
+		const {name, password, refresh} = query
+		
+		if (refresh) {
+			const updatedTokens = await updateTokens(refresh)
+			if (!updatedTokens) {
+				return NextResponse.json('Invalid refresh token', {status: 401})
+			}
+			
+			return NextResponse.json(updatedTokens)
 		}
 		
-		return NextResponse.json(updatedTokens)
-	}
-	
-	if(name && password) {
-		const tokens = await generateTokens(name,password)
-		if(!tokens) return NextResponse.json('Authentication error',{status: 401})
+		if (name && password) {
+			const tokens = await generateTokens(name, password)
+			if (!tokens) return NextResponse.json('Authentication error', {status: 401})
+			
+			return NextResponse.json(tokens)
+		}
 		
-		return NextResponse.json(tokens)
+		return NextResponse.json('Not valid data', {status: 400})
+	} catch (e) {
+		handleErrorToHTTP(e)
 	}
-	
-	return NextResponse.json('Not valid data',{status: 400})
 }

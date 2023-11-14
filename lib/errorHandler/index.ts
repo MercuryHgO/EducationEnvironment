@@ -10,12 +10,11 @@ import {NextResponse} from "next/server";
  *
  * P2003, PrismaClientValidationError  - 400
  *
- * NO_TOKEN - 401
+ * NO_TOKEN, WRONG_TOKEN, JWT_MALFORMED - 401
  *
  * P2025 - 404
  *
- * WRONG_TOKEN, NO_REQUIRED_TOKEN - 403
- */
+ * NO_REQUIRED_ROLE - 403 */
 const handleErrorToHTTP = (e: any) => {
 	if (e instanceof PrismaClientKnownRequestError) {
 		console.log(e)
@@ -31,6 +30,7 @@ const handleErrorToHTTP = (e: any) => {
 				return NextResponse.json('Server error', {status: 500})
 		}
 	}
+	if (e instanceof TypeError) return NextResponse.json('Wrong request body',{status: 400})
 	// console.log(e)
 	switch (e.name) {
 		case 'PrismaClientValidationError':
@@ -39,7 +39,9 @@ const handleErrorToHTTP = (e: any) => {
 			switch (e.message) {
 				case 'NO_TOKEN':
 					return NextResponse.json(e.cause, {status: 401})
-				case 'WRONG_TOKEN' || 'NO_REQUIRED_ROLE':
+				case 'WRONG_TOKEN':
+					return NextResponse.json(e.cause, {status: 401})
+				case 'NO_REQUIRED_ROLE':
 					return NextResponse.json(e.cause, {status: 403})
 				default:
 					console.log(e);

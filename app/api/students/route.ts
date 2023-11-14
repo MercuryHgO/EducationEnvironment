@@ -11,12 +11,10 @@ import {NextResponse} from "next/server";
 import {prisma} from "@/lib/prisma";
 import {Prisma} from ".prisma/client";
 import StudentCreateManyInput = Prisma.StudentCreateManyInput;
-import StudentScalarWhereInput = Prisma.StudentScalarWhereInput;
 import {authorizeAccess} from "@/lib/auth/requestAuthorization";
 import {Student} from "@prisma/client";
 import handleErrorToHTTP from "@/lib/errorHandler";
 import {roles} from "@/lib/config";
-import StudentUpdateArgs = Prisma.StudentUpdateArgs;
 
 /**
  * @accept
@@ -154,15 +152,31 @@ export async function POST(req: Request) {
  * JSON object / JSON объект
  *
  * **{ id, name, surname, patronymic?, groupCode }**
+ *
+ * @returns
+ * JSON object / JSON объект
+ *
+ * **{ id, name, surname, patronymic?, groupCode }**
  */
 export async function PATCH(req: Request) {
 	
 	try {
 		await authorizeAccess(req,roles?.students?.PATCH)
 		
-		const data: StudentUpdateArgs = await req.json()
+		const data: {
+			id: string,
+			name: string,
+			surname: string,
+			patronymic?: string,
+			groupCode: string,
+		} = await req.json()
 		
-		const query = await prisma.student.update(data)
+		const query = await prisma.student.update({
+			where: {
+				id: data.id
+			},
+			data: data
+		})
 		
 		return NextResponse.json(query)
 	} catch (e: any) {
@@ -174,24 +188,38 @@ export async function PATCH(req: Request) {
  * Deletes a student /
  * Удаляет студента
  * @accept
- * All the given JSON fields: **minimum 1 field necessary** / Все предоставленные поля из JSON объекта: **необходимо хотя бы одно поле**
+ * Array of student id / Массив из id студентов
  *
- * **{ id?, name?, surname?, patronymic?, groupCode? }**
+ * **{ id }[]**
+ *
+ * @returns
+ * Count of deleted entries / Кол-во удаленных записей
  */
 export async function DELETE(req: Request) {
 	
 	try {
 		await authorizeAccess(req,roles?.students?.DELETE)
 		
-		const data: StudentScalarWhereInput[] = await req.json()
+		const data: { id: string}[] = await req.json()
 		
-		const query = await prisma.student.deleteMany({
+		const gradeLogData = data.map(value => ({studentId: value.id}))
+		
+		const queryStudent = prisma.student.deleteMany({
 			where: {
-				OR: data
+				OR: data,
+			},
+		})
+		
+		const queryGradeLog = prisma.gradeLog.deleteMany({
+			where: {
+				OR: gradeLogData
 			}
 		})
 		
-		return NextResponse.json(query)
+		const query = await prisma.$transaction([queryGradeLog,queryStudent])
+		
+		
+		return NextResponse.json(query[1])
 	} catch (e: any) {
 		return handleErrorToHTTP(e)
 	}

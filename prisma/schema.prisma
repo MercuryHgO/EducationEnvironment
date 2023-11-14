@@ -104,3 +104,7 @@ model DestroyedTokens {
   Token   String   @unique
   ClearAt DateTime
 }
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}

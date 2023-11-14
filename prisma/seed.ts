@@ -32,7 +32,7 @@ async function main() {
 	console.log(userRole,adminRole)
 	
 	// users
-	const dummyUser = await prisma.user.upsert(
+	const dummyAdmin = await prisma.user.upsert(
 		{
 			where: {
 				name: 'boba'
@@ -50,7 +50,24 @@ async function main() {
 		}
 	)
 	
-	console.log(dummyUser)
+	const dummyUser = await prisma.user.upsert(
+		{
+			where: {
+				name: 'che'
+			},
+			create: {
+				name: 'che',
+				password: sha256('gevara'),
+				role: {
+					connect: {
+						name: 'user'
+					}
+				}
+			},
+			update: {}
+		}
+	)
+	console.log(dummyUser,dummyAdmin)
 	
 	
 	// students
