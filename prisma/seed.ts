@@ -90,7 +90,7 @@ async function main() {
 								create: {
 									id: 'teacherid1',
 									name: 'Наталия',
-									surname: 'Влдаимировна',
+									surname: 'Корманенко',
 									category: 'Категория',
 									education: 'Образование'
 								},
@@ -128,7 +128,7 @@ async function main() {
 								create: {
 									id: 'teacherid1',
 									name: 'Наталия',
-									surname: 'Влдаимировна',
+									surname: 'Корманенко',
 									category: 'Категория',
 									education: 'Образование'
 								},
@@ -166,7 +166,7 @@ async function main() {
 								create: {
 									id: 'teacherid1',
 									name: 'Наталия',
-									surname: 'Влдаимировна',
+									surname: 'Корманенко',
 									category: 'Категория',
 									education: 'Образование'
 								},

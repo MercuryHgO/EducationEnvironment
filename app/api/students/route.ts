@@ -28,7 +28,7 @@ import {roles} from "@/lib/config";
  * Строку поиска содержащую **id** или информацию о студенте, такую как **name**, **surname**, **patronymic** or **groupCode** (имя, фамилия, отчество, код группы).
  * Первым делом сервер ищет **id** в запросе: если таковой предоставлен, возвращает студента по его **id**, игнорируя другую предоставленную информацию.
  * Если **id** не представлен,  возвращает студента по остальным предоставленным данным, включая в поиск все предоставленные поля:
- * Это может выглядить как **"?name=[имя]"**, **"?name=[имя]&surname=[фамилия]"**, **"?patronymic=[отчество]&groupCode=[код группы]"** и т.п.
+ * Это может выглядеть как **"?name=[имя]"**, **"?name=[имя]&surname=[фамилия]"**, **"?patronymic=[отчество]&groupCode=[код группы]"** и т.п.
  *
  * @returns
  * JSON object with student info if found by **id** / JSON объект с данными о студенте, если найден по **id**
@@ -55,7 +55,7 @@ import {roles} from "@/lib/config";
  */
 export async function GET(req: Request): Promise<NextResponse<Student | Student[] | string> | undefined> {
 	try {
-		await authorizeAccess(req,roles?.students?.GET)
+		await authorizeAccess(req,roles?.teachers?.GET)
 		
 		const url = (req.url).split('?');
 		
@@ -131,7 +131,7 @@ export async function GET(req: Request): Promise<NextResponse<Student | Student[
 export async function POST(req: Request) {
 	
 	try {
-		await authorizeAccess(req,roles?.students?.POST)
+		await authorizeAccess(req,roles?.teachers?.POST)
 		
 		const data: StudentCreateManyInput[] = await req.json()
 		const query = await prisma.student.createMany({
@@ -161,7 +161,7 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
 	
 	try {
-		await authorizeAccess(req,roles?.students?.PATCH)
+		await authorizeAccess(req,roles?.teachers?.PATCH)
 		
 		const data: {
 			id: string,
@@ -198,7 +198,7 @@ export async function PATCH(req: Request) {
 export async function DELETE(req: Request) {
 	
 	try {
-		await authorizeAccess(req,roles?.students?.DELETE)
+		await authorizeAccess(req,roles?.teachers?.DELETE)
 		
 		const data: { id: string}[] = await req.json()
 		

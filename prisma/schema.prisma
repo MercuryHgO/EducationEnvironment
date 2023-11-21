@@ -37,11 +37,11 @@ model Student {
 model Group {
   code            String            @id
   specialization  String
-  curator         Teacher           @relation(fields: [teacherId], references: [id])
+  curator         Teacher?          @relation(fields: [teacherId], references: [id], onDelete: SetNull)
   Student         Student[]
   Schedule        Schedule[]
   ScheduleChanges ScheduleChanges[]
-  teacherId       String
+  teacherId       String?
 }
 
 model GradeLog {

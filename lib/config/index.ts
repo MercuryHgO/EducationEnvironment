@@ -10,6 +10,10 @@ type HTTPShortcut = {
 export const roles: {
 	students?: HTTPShortcut,
 	teachers?: HTTPShortcut,
-	gradeLog?: HTTPShortcut
+	gradeLog?: HTTPShortcut,
+	schedule?: HTTPShortcut,
+	groups?: HTTPShortcut,
+	rolesEndpoint?: HTTPShortcut,
+	subjects?: HTTPShortcut,
 } = config.roles
 

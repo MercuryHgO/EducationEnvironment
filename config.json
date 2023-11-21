@@ -21,6 +21,17 @@
       "DELETE": [
         "admin"
       ]
+    },
+    "gradeLog": {
+      "POST": [
+        "admin"
+      ],
+      "PATCH": [
+        "admin"
+      ],
+      "DELETE": [
+        "admin"
+      ]
     }
   }
 }

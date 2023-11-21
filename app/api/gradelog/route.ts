@@ -4,11 +4,43 @@ import {roles} from "@/lib/config";
 import {prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
 import {Prisma} from ".prisma/client";
-import GradeLogCreateManyArgs = Prisma.GradeLogCreateManyArgs;
 import GradeLogWhereInput = Prisma.GradeLogWhereInput;
 import GradeLogDeleteManyArgs = Prisma.GradeLogDeleteManyArgs;
+import GradeLogCreateManyInput = Prisma.GradeLogCreateManyInput;
 
-// TODO: документация
+/**
+ * @accept
+ * Entry id or filters / Id записи или фильтры
+ *
+ * **{
+ * 	id
+ * }**
+ *
+ * or
+ *
+ * **{
+ * 	startDate?,
+ * 	endDate?,
+ * 	studentName?,
+ * 	studentSurname?,
+ * 	studentPatronymic?,
+ * 	studentId?,
+ * 	group?,
+ * 	subject?
+ * }**
+ *
+ * When searching by data, both startDate and endDate required / При поиске по дате необходимы оба поля startDate и endDate
+ *
+ * @returns
+ *
+ * **{
+ *  id: string,
+ *  date: Date,
+ *  studentId: string,
+ *  subjectId: string,
+ *  grade: number
+ * }[]**
+ */
 export async function GET(req: Request) {
 	try {
 		await authorizeAccess(req,roles?.gradeLog?.GET)
@@ -33,8 +65,6 @@ export async function GET(req: Request) {
 			subject
 		} = query
 		
-		const timeStamp = startDate && endDate ? {gte: new Date(startDate), lte: new Date(endDate)} : null
-		
 		if(id) {
 			const request = await prisma.gradeLog.findUnique({
 				where: {
@@ -51,10 +81,13 @@ export async function GET(req: Request) {
 			where: {
 				OR: [
 					{
-						date: timeStamp!
+						date: {
+							lte: endDate,
+							gte: startDate
+						}
 					},
 					{
-						Subject: subject
+						subjectId: subject
 					},
 					{
 						Student: {
@@ -93,13 +126,31 @@ export async function GET(req: Request) {
 	}
 }
 
+/**
+ * @accept
+ * JSON object array / Массив JSON объектов
+ *
+ * **{
+ *  date: Date | string,
+ *  studentId: string,
+ *  subjectId: string,
+ *  grade: number
+ * }[]**
+ *
+ * @returns
+ * Count of created entries / Кол-во созданных записей
+ *
+ * **{ count: number }**
+ */
 export async function POST(req: Request) {
 	try {
 		await authorizeAccess(req,roles?.gradeLog?.POST)
 		
-		const data: GradeLogCreateManyArgs = await req.json()
+		const data: GradeLogCreateManyInput[] = await req.json()
 		
-		const query = await prisma.gradeLog.createMany(data)
+		const query = await prisma.gradeLog.createMany({
+			data: data
+		})
 		
 		return NextResponse.json(query)
 	} catch (e) {
@@ -107,6 +158,26 @@ export async function POST(req: Request) {
 	}
 }
 
+/**
+ * @accept
+ * **{
+ * 	id,
+ * 	date,
+ * 	studentId,
+ * 	subject,
+ * 	grade
+ * }**
+ *
+ * @returns
+ *
+ * **{
+ * id: string,
+ * date: Date,
+ * studentId: string,
+ * subjectId: string,
+ * grade: number
+ * }**
+ */
 export async function PATCH(req: Request) {
 	try {
 		await authorizeAccess(req,roles?.gradeLog?.PATCH)
@@ -147,6 +218,12 @@ export async function PATCH(req: Request) {
 	}
 }
 
+/**
+ * @accept
+ * **{id}[]**
+ * @returns
+ * Count of deleted entries / Кол-во удаленных записей
+ */
 export async function DELETE(req: Request) {
 	try {
 		await authorizeAccess(req,roles?.gradeLog?.DELETE)
