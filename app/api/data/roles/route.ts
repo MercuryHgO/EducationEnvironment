@@ -1,11 +1,11 @@
 import {authorizeAccess} from "@/lib/auth/requestAuthorization";
 import {roles} from "@/lib/config";
-import handleErrorToHTTP from "@/lib/errorHandler";
 import {prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
 import {Prisma} from ".prisma/client";
 import RoleDeleteManyArgs = Prisma.RoleDeleteManyArgs;
 import RoleWhereInput = Prisma.RoleWhereInput;
+import handleErrorToHTTP from "@/lib/errorHandler";
 
 export async function GET(req: Request) {
 	try {
@@ -44,7 +44,7 @@ export async function GET(req: Request) {
 		return NextResponse.json(request)
 		
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 }
 export async function POST(req: Request) {
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
 		
 		return NextResponse.json(request)
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 }
 export async function PATCH(req: Request) {
@@ -78,7 +78,7 @@ export async function PATCH(req: Request) {
 		return NextResponse.json(request)
 		
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 }
 export async function DELETE(req: Request) {
@@ -95,6 +95,6 @@ export async function DELETE(req: Request) {
 		
 		return NextResponse.json(request)
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 }

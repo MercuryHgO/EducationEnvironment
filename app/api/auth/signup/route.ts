@@ -24,6 +24,6 @@ export async function POST(req: Request) {
 			return NextResponse.json('Server error', {status: 500})
 		}
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 }

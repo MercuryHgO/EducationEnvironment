@@ -32,6 +32,6 @@ export async function GET(req: Request) {
 		
 		return NextResponse.json('Not valid data', {status: 400})
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 }

@@ -71,7 +71,7 @@ export async function GET(req: Request) {
 		
 		return NextResponse.json(request)
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 }
 export async function POST(req: Request) {
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
 		
 		return NextResponse.json(request)
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 	
 }
@@ -107,7 +107,7 @@ export async function PATCH(req: Request) {
 		
 		return NextResponse.json(request)
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 	
 }
@@ -125,7 +125,7 @@ export async function DELETE(req: Request) {
 		
 		return NextResponse.json(request)
 	} catch (e) {
-		handleErrorToHTTP(e)
+		return handleErrorToHTTP(e)
 	}
 	
 }

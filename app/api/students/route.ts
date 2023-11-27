@@ -12,7 +12,6 @@ import {prisma} from "@/lib/prisma";
 import {Prisma} from ".prisma/client";
 import StudentCreateManyInput = Prisma.StudentCreateManyInput;
 import {authorizeAccess} from "@/lib/auth/requestAuthorization";
-import {Student} from "@prisma/client";
 import handleErrorToHTTP from "@/lib/errorHandler";
 import {roles} from "@/lib/config";
 
@@ -53,7 +52,7 @@ import {roles} from "@/lib/config";
  * #
  *
  */
-export async function GET(req: Request): Promise<NextResponse<Student | Student[] | string> | undefined> {
+export async function GET(req: Request) {
 	try {
 		await authorizeAccess(req,roles?.teachers?.GET)
 		

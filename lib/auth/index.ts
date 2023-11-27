@@ -3,6 +3,11 @@ import {verify, sign, JwtPayload, VerifyErrors } from "jsonwebtoken";
 import {prisma} from "@/lib/prisma"
 import keys from "@/lib/dotenv"
 
+/**
+ * Checks destroyed tokens in database and deletes them if necessary
+ *
+ * Проверяет уничтоженные токены в базе данных и удаляет их, если необходимо
+ */
 async function deleteExpiredDestroyedTokens() {
 	const now = new Date()
 	await prisma.destroyedTokens.deleteMany({
