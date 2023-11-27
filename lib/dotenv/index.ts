@@ -3,7 +3,6 @@ import {configDotenv} from "dotenv";
 configDotenv()
 
 const keysArray = [
-	[ 'DATABASE_URL', process.env.DATABASE_URL! ],
 	[ 'JWT_ACCESS_KEY', process.env.JWT_ACCESS_KEY! ],
 	[ 'JWT_REFRESH_KEY',  process.env.JWT_REFRESH_KEY! ]
 ]
@@ -14,7 +13,6 @@ keysArray.forEach((obj) => {
 })
 
 const keys: {
-	DATABASE_URL: string,
 	JWT_ACCESS_KEY: string,
 	JWT_REFRESH_KEY: string,
 } = Object.fromEntries(keysArray)
